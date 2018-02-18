@@ -13,11 +13,39 @@ npm install messenger-batch
 ## Usage
 
 ```js
+const { MessengerClient, MessengerBatch } = require('messaging-api-messenger');
 const { MessengerBatchQueue } = require('messenger-batch');
+
+const client = MessengerClient.connect({
+  accessToken: ACCESS_TOKEN,
+});
 
 const queue = new MessengerBatchQueue(client);
 
-queue.push();
+(async () => {
+  await queue.push(
+    MessengerBatch.createText('psid', 'hello!');
+  );
+
+  await queue.push(
+    MessengerBatch.createMessage('psid', {
+      attachment: {
+        type: 'image',
+        payload: {
+          url:
+            'https://cdn.free.com.tw/blog/wp-content/uploads/2014/08/Placekitten480-g.jpg',
+        },
+      },
+    })
+  );
+
+  const profile = await queue.push({
+    method: 'GET',
+    relative_url: 'psid',
+  });
+
+  console.log(profile);
+})();
 ```
 
 ## Options

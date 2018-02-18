@@ -33,7 +33,7 @@ module.exports = class MessengerBatchQueue {
     items.forEach(({ resolve, reject }, i) => {
       const res = responses[i];
       if (res.code === 200) {
-        resolve(res.body.data);
+        resolve(JSON.parse(res.body));
       } else {
         reject(res);
       }
