@@ -28,7 +28,7 @@ module.exports = class MessengerBatchQueue {
   async flush() {
     const items = this._queue.splice(0, MAX_BATCH_SIZE);
 
-    const responses = await this._client.sendBatch(items);
+    const responses = await this._client.sendBatch(items.map(i => i.request));
 
     items.forEach(({ resolve, reject }, i) => {
       const res = responses[i];
