@@ -2,7 +2,7 @@
   "name": "messenger-batch",
   "description": "handling messenger requests.",
   "license": "MIT",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "main": "src/index.js",
   "scripts": {
     "precommit": "lint-staged",
