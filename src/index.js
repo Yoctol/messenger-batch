@@ -1,0 +1,1 @@
+exports.MessengerBatchQueue = require('./MessengerBatchQueue');
