@@ -1,6 +1,6 @@
 const MAX_BATCH_SIZE = 50;
 
-export default class MessengerBatchQueue {
+module.exports = class MessengerBatchQueue {
   constructor(client, options = {}) {
     this._client = client;
     this._queue = [];
@@ -39,4 +39,4 @@ export default class MessengerBatchQueue {
       }
     });
   }
-}
+};
