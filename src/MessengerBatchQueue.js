@@ -6,7 +6,7 @@ module.exports = class MessengerBatchQueue {
     this._queue = [];
     this._delay = options._delay || 1000;
 
-    setInterval(() => this.flush(), this._delay);
+    this._timeout = setTimeout(() => this.flush(), this._delay);
   }
 
   get queue() {
@@ -28,6 +28,9 @@ module.exports = class MessengerBatchQueue {
   async flush() {
     const items = this._queue.splice(0, MAX_BATCH_SIZE);
 
+    clearTimeout(this._timeout);
+    this._timeout = setTimeout(() => this.flush(), this._delay);
+
     const responses = await this._client.sendBatch(items.map(i => i.request));
 
     items.forEach(({ resolve, reject }, i) => {
@@ -38,5 +41,9 @@ module.exports = class MessengerBatchQueue {
         reject(res);
       }
     });
+  }
+
+  stop() {
+    clearTimeout(this._timeout);
   }
 };
