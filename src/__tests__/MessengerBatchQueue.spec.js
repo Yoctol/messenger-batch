@@ -127,6 +127,28 @@ it('should flush with 1000 timeout', async () => {
   ]);
 });
 
+it('should not send batch when with empty array', async () => {
+  const { client } = setup();
+
+  const responses = Array(1)
+    .fill(0)
+    .map(() => ({
+      code: 200,
+      body: '{"data": []}',
+    }));
+
+  client.sendBatch.mockReturnValue(Promise.resolve(responses));
+
+  expect(setTimeout).toHaveBeenCalledTimes(1);
+  expect(setTimeout).toHaveBeenLastCalledWith(expect.any(Function), 1000);
+
+  const fn = setTimeout.mock.calls[0][0];
+
+  await fn();
+
+  expect(client.sendBatch).not.toBeCalled();
+});
+
 it('should reset timeout when flush', async () => {
   const { client, timeoutId } = setup();
 

@@ -31,6 +31,8 @@ module.exports = class MessengerBatchQueue {
     clearTimeout(this._timeout);
     this._timeout = setTimeout(() => this.flush(), this._delay);
 
+    if (items.length < 1) return;
+
     const responses = await this._client.sendBatch(items.map(i => i.request));
 
     items.forEach(({ resolve, reject }, i) => {
