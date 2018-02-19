@@ -4,6 +4,8 @@
 [![Build Status](https://travis-ci.org/Yoctol/messenger-batch.svg?branch=master)](https://travis-ci.org/Yoctol/messenger-batch)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
+> Gracefully batching messenger requests.
+
 ## Installation
 
 ```sh

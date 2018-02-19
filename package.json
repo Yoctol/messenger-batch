@@ -1,6 +1,6 @@
 {
   "name": "messenger-batch",
-  "description": "handling messenger requests.",
+  "description": "Gracefully batching messenger requests.",
   "license": "MIT",
   "version": "0.1.1",
   "main": "src/index.js",
@@ -28,7 +28,13 @@
     "prettier": "^1.10.2",
     "prettier-package-json": "^1.4.0"
   },
-  "keywords": [],
+  "keywords": [
+    "batch",
+    "bottender",
+    "facebook",
+    "messaging-apis",
+    "messenger"
+  ],
   "jest": {
     "testEnvironment": "node",
     "timers": "fake",
