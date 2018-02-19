@@ -130,12 +130,12 @@ it('should flush with 1000 timeout', async () => {
 it('should not send batch when with empty array', async () => {
   const { client } = setup();
 
-  const responses = Array(1)
-    .fill(0)
-    .map(() => ({
+  const responses = [
+    {
       code: 200,
       body: '{"data": []}',
-    }));
+    },
+  ];
 
   client.sendBatch.mockReturnValue(Promise.resolve(responses));
 
@@ -175,4 +175,57 @@ it('should reset timeout when flush', async () => {
   expect(clearTimeout).toHaveBeenLastCalledWith(timeoutId);
   expect(setTimeout).toHaveBeenCalledTimes(2);
   expect(setTimeout).toHaveBeenLastCalledWith(expect.any(Function), 1000);
+});
+
+it('should throw request and response', async () => {
+  const { client } = setup();
+
+  const responses = [
+    {
+      code: 400,
+      body:
+        '{"error": {"message": "(#100) Param recipient[id] must be a valid ID string (e.g., "123")"} }',
+    },
+  ];
+
+  client.sendBatch.mockReturnValue(Promise.resolve(responses));
+
+  let error;
+
+  q.push(MessengerBatch.createMessage('1412611362105802', image)).catch(err => {
+    error = err;
+  });
+
+  expect(setTimeout).toHaveBeenCalledTimes(1);
+  expect(setTimeout).toHaveBeenLastCalledWith(expect.any(Function), 1000);
+
+  const fn = setTimeout.mock.calls[0][0];
+
+  await fn();
+
+  expect(error).toBeDefined();
+  expect(error).toEqual({
+    request: {
+      body: {
+        message: {
+          attachment: {
+            payload: {
+              url:
+                'https://cdn.free.com.tw/blog/wp-content/uploads/2014/08/Placekitten480-g.jpg',
+            },
+            type: 'image',
+          },
+        },
+        messaging_type: 'UPDATE',
+        recipient: { id: '1412611362105802' },
+      },
+      method: 'POST',
+      relative_url: 'me/messages',
+    },
+    response: {
+      body:
+        '{"error": {"message": "(#100) Param recipient[id] must be a valid ID string (e.g., "123")"} }',
+      code: 400,
+    },
+  });
 });
