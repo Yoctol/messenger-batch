@@ -35,12 +35,12 @@ module.exports = class MessengerBatchQueue {
 
     const responses = await this._client.sendBatch(items.map(i => i.request));
 
-    items.forEach(({ resolve, reject }, i) => {
-      const res = responses[i];
-      if (res.code === 200) {
-        resolve(JSON.parse(res.body));
+    items.forEach(({ request, resolve, reject }, i) => {
+      const response = responses[i];
+      if (response.code === 200) {
+        resolve(JSON.parse(response.body));
       } else {
-        reject(res);
+        reject({ response, request });
       }
     });
   }
