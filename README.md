@@ -56,6 +56,10 @@ const queue = new MessengerBatchQueue(client);
 
 Default: `1000`.
 
+### retryTimes
+
+Default: `0`.
+
 ## License
 
 MIT © [Yoctol](https://github.com/Yoctol/messenger-batch)
