@@ -14,13 +14,13 @@ const image = {
 
 let q;
 
-function setup() {
+function setup(options = {}) {
   const timeoutId = 'timeoutId';
   setTimeout.mockReturnValue(timeoutId);
   const client = {
     sendBatch: jest.fn(),
   };
-  q = new MessengerBatchQueue(client);
+  q = new MessengerBatchQueue(client, options);
   return {
     client,
     timeoutId,
@@ -85,12 +85,12 @@ it('should flush when length >= 50', async () => {
 it('should flush with 1000 timeout', async () => {
   const { client } = setup();
 
-  const responses = Array(1)
-    .fill(0)
-    .map(() => ({
+  const responses = [
+    {
       code: 200,
       body: '{"data": []}',
-    }));
+    },
+  ];
 
   client.sendBatch.mockReturnValue(Promise.resolve(responses));
 
@@ -228,4 +228,54 @@ it('should throw request and response', async () => {
       code: 400,
     },
   });
+});
+
+it('should support delay option', async () => {
+  const { client } = setup({ delay: 500 });
+
+  const responses = [
+    {
+      code: 200,
+      body: '{"data": []}',
+    },
+  ];
+
+  client.sendBatch.mockReturnValue(Promise.resolve(responses));
+
+  expect(setTimeout).toHaveBeenCalledTimes(1);
+  expect(setTimeout).toHaveBeenLastCalledWith(expect.any(Function), 500);
+});
+
+it('should support retryTimes option', async () => {
+  const { client } = setup({ retryTimes: 3 });
+
+  const responses = [
+    {
+      code: 400,
+      body:
+        '{"error": {"message": "(#100) Param recipient[id] must be a valid ID string (e.g., "123")"} }',
+    },
+  ];
+
+  client.sendBatch.mockReturnValue(Promise.resolve(responses));
+
+  let error;
+
+  q.push(MessengerBatch.createMessage('1412611362105802', image)).catch(err => {
+    error = err;
+  });
+
+  const fn = setTimeout.mock.calls[0][0];
+
+  await fn();
+  expect(error).not.toBeDefined();
+
+  await fn();
+  expect(error).not.toBeDefined();
+
+  await fn();
+  expect(error).not.toBeDefined();
+
+  await fn();
+  expect(error).toBeDefined();
 });

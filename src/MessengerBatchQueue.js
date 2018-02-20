@@ -4,7 +4,8 @@ module.exports = class MessengerBatchQueue {
   constructor(client, options = {}) {
     this._client = client;
     this._queue = [];
-    this._delay = options._delay || 1000;
+    this._delay = options.delay || 1000;
+    this._retryTimes = options.retryTimes || 0;
 
     this._timeout = setTimeout(() => this.flush(), this._delay);
   }
@@ -35,10 +36,12 @@ module.exports = class MessengerBatchQueue {
 
     const responses = await this._client.sendBatch(items.map(i => i.request));
 
-    items.forEach(({ request, resolve, reject }, i) => {
+    items.forEach(({ request, resolve, reject, retry = 0 }, i) => {
       const response = responses[i];
       if (response.code === 200) {
         resolve(JSON.parse(response.body));
+      } else if (retry < this._retryTimes) {
+        this._queue.push({ request, resolve, reject, retry: retry + 1 });
       } else {
         reject({ response, request });
       }
