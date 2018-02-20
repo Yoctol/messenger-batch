@@ -37,19 +37,29 @@ module.exports = class MessengerBatchQueue {
 
     if (items.length < 1) return;
 
-    const responses = await this._client.sendBatch(items.map(i => i.request));
+    try {
+      const responses = await this._client.sendBatch(items.map(i => i.request));
 
-    items.forEach(({ request, resolve, reject, retry = 0 }, i) => {
-      const response = responses[i];
-      const err = { response, request };
-      if (response.code === 200) {
-        resolve(JSON.parse(response.body));
-      } else if (retry < this._retryTimes && this._shouldRetry(err)) {
-        this._queue.push({ request, resolve, reject, retry: retry + 1 });
-      } else {
-        reject(err);
-      }
-    });
+      items.forEach(({ request, resolve, reject, retry = 0 }, i) => {
+        const response = responses[i];
+        const err = { response, request };
+        if (response.code === 200) {
+          resolve(JSON.parse(response.body));
+        } else if (retry < this._retryTimes && this._shouldRetry(err)) {
+          this._queue.push({ request, resolve, reject, retry: retry + 1 });
+        } else {
+          reject(err);
+        }
+      });
+    } catch (err) {
+      items.forEach(({ request, resolve, reject, retry = 0 }) => {
+        if (retry < this._retryTimes && this._shouldRetry(err)) {
+          this._queue.push({ request, resolve, reject, retry: retry + 1 });
+        } else {
+          reject(err);
+        }
+      });
+    }
   }
 
   stop() {
