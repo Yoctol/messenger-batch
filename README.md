@@ -50,6 +50,17 @@ const queue = new MessengerBatchQueue(client);
 })();
 ```
 
+Retry for error: `(#613) Calls to this api have exceeded the rate limit.`.
+
+```js
+const { MessengerBatchQueue, isError613 } = require('messenger-batch');
+
+const queue = new MessengerBatchQueue(client, {
+  shouldRetry: isError613,
+  retryTimes: 2,
+});
+```
+
 ## Options
 
 ### delay

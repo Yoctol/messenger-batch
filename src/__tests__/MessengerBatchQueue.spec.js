@@ -1,5 +1,6 @@
 const { MessengerBatch } = require('messaging-api-messenger');
 
+const { isError613 } = require('../');
 const MessengerBatchQueue = require('../MessengerBatchQueue');
 
 const image = {
@@ -283,14 +284,7 @@ it('should support retryTimes option', async () => {
 it('should support shouldRetry option', async () => {
   const { client } = setup({
     retryTimes: 1,
-    shouldRetry: err => {
-      try {
-        const { message } = JSON.parse(err.response.body).error;
-        return /#613/.test(message);
-      } catch (_) {
-        return false;
-      }
-    },
+    shouldRetry: isError613,
   });
 
   const responses = [
