@@ -1,10 +1,13 @@
 const MAX_BATCH_SIZE = 50;
 
+const alwaysTrue = () => true;
+
 module.exports = class MessengerBatchQueue {
   constructor(client, options = {}) {
     this._client = client;
     this._queue = [];
     this._delay = options.delay || 1000;
+    this._shouldRetry = options.shouldRetry || alwaysTrue;
     this._retryTimes = options.retryTimes || 0;
 
     this._timeout = setTimeout(() => this.flush(), this._delay);
@@ -38,12 +41,13 @@ module.exports = class MessengerBatchQueue {
 
     items.forEach(({ request, resolve, reject, retry = 0 }, i) => {
       const response = responses[i];
+      const err = { response, request };
       if (response.code === 200) {
         resolve(JSON.parse(response.body));
-      } else if (retry < this._retryTimes) {
+      } else if (retry < this._retryTimes && this._shouldRetry(err)) {
         this._queue.push({ request, resolve, reject, retry: retry + 1 });
       } else {
-        reject({ response, request });
+        reject(err);
       }
     });
   }

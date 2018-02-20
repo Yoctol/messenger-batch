@@ -60,6 +60,10 @@ Default: `1000`.
 
 Default: `0`.
 
+### shouldRetry
+
+Default: `() => true`.
+
 ## License
 
 MIT © [Yoctol](https://github.com/Yoctol/messenger-batch)

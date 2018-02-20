@@ -58,7 +58,7 @@ it('should flush when length >= 50', async () => {
 
   q.push(MessengerBatch.createMessage('1412611362105802', image));
 
-  expect(client.sendBatch.mock.calls).toHaveLength(1);
+  expect(client.sendBatch).toHaveBeenCalledTimes(1);
   expect(client.sendBatch.mock.calls[0][0]).toHaveLength(50);
 
   expect(client.sendBatch.mock.calls[0][0][49]).toEqual({
@@ -105,7 +105,7 @@ it('should flush with 1000 timeout', async () => {
 
   await fn();
 
-  expect(client.sendBatch.mock.calls).toHaveLength(1);
+  expect(client.sendBatch).toHaveBeenCalledTimes(1);
   expect(client.sendBatch.mock.calls[0][0]).toEqual([
     {
       body: {
@@ -184,7 +184,7 @@ it('should throw request and response', async () => {
     {
       code: 400,
       body:
-        '{"error": {"message": "(#100) Param recipient[id] must be a valid ID string (e.g., "123")"} }',
+        '{"error": {"message": "(#100) Param recipient[id] must be a valid ID string (e.g., \\"123\\")"} }',
     },
   ];
 
@@ -224,7 +224,7 @@ it('should throw request and response', async () => {
     },
     response: {
       body:
-        '{"error": {"message": "(#100) Param recipient[id] must be a valid ID string (e.g., "123")"} }',
+        '{"error": {"message": "(#100) Param recipient[id] must be a valid ID string (e.g., \\"123\\")"} }',
       code: 400,
     },
   });
@@ -253,7 +253,7 @@ it('should support retryTimes option', async () => {
     {
       code: 400,
       body:
-        '{"error": {"message": "(#100) Param recipient[id] must be a valid ID string (e.g., "123")"} }',
+        '{"error": {"message": "(#100) Param recipient[id] must be a valid ID string (e.g., \\"123\\")"} }',
     },
   ];
 
@@ -278,4 +278,68 @@ it('should support retryTimes option', async () => {
 
   await fn();
   expect(error).toBeDefined();
+});
+
+it('should support shouldRetry option', async () => {
+  const { client } = setup({
+    retryTimes: 1,
+    shouldRetry: err => {
+      try {
+        const { message } = JSON.parse(err.response.body).error;
+        return /#613/.test(message);
+      } catch (_) {
+        return false;
+      }
+    },
+  });
+
+  const responses = [
+    {
+      code: 400,
+      body:
+        '{"error": {"message": "(#100) Param recipient[id] must be a valid ID string (e.g., \\"123\\")"} }',
+    },
+    {
+      code: 400,
+      body:
+        '{"error": {"message": "(#613) Calls to this api have exceeded the rate limit."} }',
+    },
+  ];
+
+  client.sendBatch.mockReturnValue(Promise.resolve(responses));
+
+  let error1;
+  const request1 = MessengerBatch.createMessage('1412611362105802', image);
+
+  q.push(request1).catch(err => {
+    error1 = err;
+  });
+
+  let error2;
+  const request2 = MessengerBatch.createMessage('1412611362105802', image);
+
+  q.push(request2).catch(err => {
+    error2 = err;
+  });
+
+  expect(q.queue).toHaveLength(2);
+
+  const fn = setTimeout.mock.calls[0][0];
+
+  await fn();
+  expect(q.queue).toHaveLength(1);
+  expect(client.sendBatch).toHaveBeenCalledTimes(1);
+  expect(client.sendBatch.mock.calls[0][0]).toHaveLength(2);
+  expect(client.sendBatch.mock.calls[0][0][0]).toBe(request1);
+  expect(client.sendBatch.mock.calls[0][0][1]).toBe(request2);
+  expect(error1).toBeDefined();
+  expect(error2).not.toBeDefined();
+
+  await fn();
+  expect(q.queue).toHaveLength(0);
+  expect(client.sendBatch).toHaveBeenCalledTimes(2);
+  expect(client.sendBatch.mock.calls[1][0]).toHaveLength(1);
+  expect(client.sendBatch.mock.calls[1][0][0]).toBe(request2);
+
+  expect(error2).toBeDefined();
 });
