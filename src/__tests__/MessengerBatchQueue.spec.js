@@ -337,3 +337,32 @@ it('should support shouldRetry option', async () => {
 
   expect(error2).toBeDefined();
 });
+
+it('should reject every promise when call batch failed', async () => {
+  const { client } = setup();
+
+  client.sendBatch.mockImplementation(() => {
+    throw new Error('boom');
+  });
+
+  let error1;
+  const request1 = MessengerBatch.createMessage('1412611362105802', image);
+
+  q.push(request1).catch(err => {
+    error1 = err;
+  });
+
+  let error2;
+  const request2 = MessengerBatch.createMessage('1412611362105802', image);
+
+  q.push(request2).catch(err => {
+    error2 = err;
+  });
+
+  const fn = setTimeout.mock.calls[0][0];
+
+  await fn().catch(() => {});
+
+  expect(error1).toBeDefined();
+  expect(error2).toBeDefined();
+});
