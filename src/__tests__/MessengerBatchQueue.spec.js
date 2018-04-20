@@ -35,7 +35,7 @@ afterEach(() => {
 it('should push psid and messages to queue', () => {
   setup();
 
-  q.push(MessengerBatch.createMessage('1412611362105802', image));
+  q.push(MessengerBatch.sendMessage('1412611362105802', image));
 
   expect(q.queue).toHaveLength(1);
 });
@@ -54,10 +54,10 @@ it('should flush when length >= 50', async () => {
 
   for (let i = 0; i < 49; i++) {
     // eslint-disable-next-line no-await-in-loop
-    q.push(MessengerBatch.createText('1412611362105802', 'hello'));
+    q.push(MessengerBatch.sendText('1412611362105802', 'hello'));
   }
 
-  q.push(MessengerBatch.createMessage('1412611362105802', image));
+  q.push(MessengerBatch.sendMessage('1412611362105802', image));
 
   expect(client.sendBatch).toHaveBeenCalledTimes(1);
   expect(client.sendBatch.mock.calls[0][0]).toHaveLength(50);
@@ -98,7 +98,7 @@ it('should flush with 1000 timeout', async () => {
   expect(setTimeout).toHaveBeenCalledTimes(1);
   expect(setTimeout).toHaveBeenLastCalledWith(expect.any(Function), 1000);
 
-  q.push(MessengerBatch.createMessage('1412611362105802', image));
+  q.push(MessengerBatch.sendMessage('1412611362105802', image));
 
   expect(q.queue).toHaveLength(1);
 
@@ -167,10 +167,10 @@ it('should reset timeout when flush', async () => {
 
   for (let i = 0; i < 49; i++) {
     // eslint-disable-next-line no-await-in-loop
-    q.push(MessengerBatch.createText('1412611362105802', 'hello'));
+    q.push(MessengerBatch.sendText('1412611362105802', 'hello'));
   }
 
-  q.push(MessengerBatch.createMessage('1412611362105802', image));
+  q.push(MessengerBatch.sendMessage('1412611362105802', image));
 
   expect(clearTimeout).toHaveBeenCalledTimes(1);
   expect(clearTimeout).toHaveBeenLastCalledWith(timeoutId);
@@ -193,7 +193,7 @@ it('should throw request and response', async () => {
 
   let error;
 
-  q.push(MessengerBatch.createMessage('1412611362105802', image)).catch(err => {
+  q.push(MessengerBatch.sendMessage('1412611362105802', image)).catch(err => {
     error = err;
   });
 
@@ -262,7 +262,7 @@ it('should support retryTimes option', async () => {
 
   let error;
 
-  q.push(MessengerBatch.createMessage('1412611362105802', image)).catch(err => {
+  q.push(MessengerBatch.sendMessage('1412611362105802', image)).catch(err => {
     error = err;
   });
 
@@ -303,14 +303,14 @@ it('should support shouldRetry option', async () => {
   client.sendBatch.mockReturnValue(Promise.resolve(responses));
 
   let error1;
-  const request1 = MessengerBatch.createMessage('1412611362105802', image);
+  const request1 = MessengerBatch.sendMessage('1412611362105802', image);
 
   q.push(request1).catch(err => {
     error1 = err;
   });
 
   let error2;
-  const request2 = MessengerBatch.createMessage('1412611362105802', image);
+  const request2 = MessengerBatch.sendMessage('1412611362105802', image);
 
   q.push(request2).catch(err => {
     error2 = err;
@@ -346,14 +346,14 @@ it('should reject every promise when call batch failed', async () => {
   });
 
   let error1;
-  const request1 = MessengerBatch.createMessage('1412611362105802', image);
+  const request1 = MessengerBatch.sendMessage('1412611362105802', image);
 
   q.push(request1).catch(err => {
     error1 = err;
   });
 
   let error2;
-  const request2 = MessengerBatch.createMessage('1412611362105802', image);
+  const request2 = MessengerBatch.sendMessage('1412611362105802', image);
 
   q.push(request2).catch(err => {
     error2 = err;
