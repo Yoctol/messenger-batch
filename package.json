@@ -17,16 +17,16 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "eslint": "^4.16.0",
-    "eslint-config-yoctol-base": "^0.15.0",
-    "eslint-plugin-import": "^2.8.0",
-    "eslint-plugin-prettier": "^2.5.0",
+    "eslint": "^4.19.1",
+    "eslint-config-yoctol-base": "^0.15.1",
+    "eslint-plugin-import": "^2.11.0",
+    "eslint-plugin-prettier": "^2.6.0",
     "husky": "^0.14.3",
-    "jest": "^22.1.4",
-    "lint-staged": "^6.1.0",
-    "messaging-api-messenger": "^0.6.13",
-    "prettier": "^1.10.2",
-    "prettier-package-json": "^1.4.0"
+    "jest": "^22.4.3",
+    "lint-staged": "^7.0.5",
+    "messaging-api-messenger": "^0.7.0",
+    "prettier": "^1.12.1",
+    "prettier-package-json": "^1.5.1"
   },
   "keywords": [
     "batch",

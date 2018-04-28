@@ -26,11 +26,11 @@ const queue = new MessengerBatchQueue(client);
 
 (async () => {
   await queue.push(
-    MessengerBatch.createText('psid', 'hello!');
+    MessengerBatch.sendText('psid', 'hello!');
   );
 
   await queue.push(
-    MessengerBatch.createMessage('psid', {
+    MessengerBatch.sendMessage('psid', {
       attachment: {
         type: 'image',
         payload: {
@@ -41,10 +41,8 @@ const queue = new MessengerBatchQueue(client);
     })
   );
 
-  const profile = await queue.push({
-    method: 'GET',
-    relative_url: 'psid',
-  });
+  const profile = await queue.push(MessengerBatch.getUserProfile('psid'));
+
 
   console.log(profile);
 })();
