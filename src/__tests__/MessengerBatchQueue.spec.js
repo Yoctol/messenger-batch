@@ -205,29 +205,27 @@ it('should throw request and response', async () => {
   await fn();
 
   expect(error).toBeDefined();
-  expect(error).toEqual({
-    request: {
-      body: {
-        message: {
-          attachment: {
-            payload: {
-              url:
-                'https://cdn.free.com.tw/blog/wp-content/uploads/2014/08/Placekitten480-g.jpg',
-            },
-            type: 'image',
+  expect(error.request).toEqual({
+    body: {
+      message: {
+        attachment: {
+          payload: {
+            url:
+              'https://cdn.free.com.tw/blog/wp-content/uploads/2014/08/Placekitten480-g.jpg',
           },
+          type: 'image',
         },
-        messaging_type: 'UPDATE',
-        recipient: { id: '1412611362105802' },
       },
-      method: 'POST',
-      relative_url: 'me/messages',
+      messaging_type: 'UPDATE',
+      recipient: { id: '1412611362105802' },
     },
-    response: {
-      body:
-        '{"error": {"message": "(#100) Param recipient[id] must be a valid ID string (e.g., \\"123\\")"} }',
-      code: 400,
-    },
+    method: 'POST',
+    relative_url: 'me/messages',
+  });
+  expect(error.response).toEqual({
+    body:
+      '{"error": {"message": "(#100) Param recipient[id] must be a valid ID string (e.g., \\"123\\")"} }',
+    code: 400,
   });
 });
 

@@ -1,3 +1,5 @@
+const BatchRequestError = require('./BatchRequestError');
+
 const MAX_BATCH_SIZE = 50;
 
 const alwaysTrue = () => true;
@@ -48,7 +50,7 @@ module.exports = class MessengerBatchQueue {
         } else if (retry < this._retryTimes && this._shouldRetry(err)) {
           this._queue.push({ request, resolve, reject, retry: retry + 1 });
         } else {
-          reject(err);
+          reject(new BatchRequestError(err));
         }
       });
     } catch (err) {
