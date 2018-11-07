@@ -12,6 +12,8 @@
 npm install messenger-batch
 ```
 
+This module is based on the approach described in [Making Batch Requests](https://developers.facebook.com/docs/graph-api/making-multiple-requests/).
+
 ## Usage
 
 ```js
