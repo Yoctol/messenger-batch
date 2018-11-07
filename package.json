@@ -15,7 +15,9 @@
     "testonly:watch": "jest --watch",
     "preversion": "npm test"
   },
-  "dependencies": {},
+  "dependencies": {
+    "invariant": "^2.2.4"
+  },
   "devDependencies": {
     "eslint": "^4.19.1",
     "eslint-config-yoctol-base": "^0.15.1",

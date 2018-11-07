@@ -1,3 +1,5 @@
+const invariant = require('invariant');
+
 const BatchRequestError = require('./BatchRequestError');
 
 const MAX_BATCH_SIZE = 50;
@@ -6,6 +8,8 @@ const alwaysTrue = () => true;
 
 module.exports = class MessengerBatchQueue {
   constructor(client, options = {}) {
+    invariant(client, 'Must provide MessengerClient instance');
+
     this._client = client;
     this._queue = [];
     this._delay = options.delay || 1000;
