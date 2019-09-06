@@ -11,6 +11,6 @@ message=Test status update&amp;link=http://developers.facebook.com/
 
 Response -
 403
-{\\"error\\":{\\"type\\":\\"OAuthException\\" }}
+{\\"error\\":{\\"type\\":\\"OAuthException\\",\\"message\\": \\"Invalid parameter\\",\\"code\\": 100}}
     "
 `;

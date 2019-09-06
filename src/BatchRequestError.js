@@ -1,6 +1,11 @@
+const { getErrorMessage } = require('./utils');
+
 module.exports = class BatchRequestError extends Error {
   constructor({ request, response }) {
-    super('Batch Request Error');
+    const message = getErrorMessage({ request, response });
+
+    super(`Batch Request Error - ${message}`);
+
     this.request = request;
     this.response = response;
   }
