@@ -47,6 +47,8 @@ const queue = new MessengerBatchQueue(client);
 
 
   console.log(profile);
+
+  queue.stop();
 })();
 ```
 
