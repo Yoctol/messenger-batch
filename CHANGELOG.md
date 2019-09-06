@@ -1,3 +1,7 @@
+# 0.3.1 / 2019-09-06
+
+* [improve] improve error message for BatchRequestError (#29)
+
 # 0.3.0 / 2018-04-28
 
 * [improve] improve error format
