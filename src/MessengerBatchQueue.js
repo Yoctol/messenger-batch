@@ -48,10 +48,14 @@ module.exports = class MessengerBatchQueue {
 
       items.forEach(({ request, resolve, reject, retry = 0 }, i) => {
         const response = responses[i];
-        const err = { response, request };
         if (response.code === 200) {
           resolve(JSON.parse(response.body));
-        } else if (retry < this._retryTimes && this._shouldRetry(err)) {
+          return;
+        }
+
+        const err = { response, request };
+
+        if (retry < this._retryTimes && this._shouldRetry(err)) {
           this._queue.push({ request, resolve, reject, retry: retry + 1 });
         } else {
           reject(new BatchRequestError(err));
