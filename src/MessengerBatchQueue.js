@@ -17,6 +17,22 @@ module.exports = class MessengerBatchQueue {
     this._retryTimes = options.retryTimes || 0;
 
     this._timeout = setTimeout(() => this.flush(), this._delay);
+
+    this._client.interceptors.response.use(null, error => {
+      const { config } = error;
+
+      // isBatch
+      if (
+        config.url === '/' && // should fix messaging-api-messenger first
+        config.method === 'post' &&
+        Array.isArray(config.data.batch)
+        // other condition? 500 408 -1 fn
+      ) {
+        // https://github.com/softonic/axios-retry/blob/34658076621bbbe31e6ed66f5a7402732493c402/es/index.js#L207-L209
+        // retry with same batch? or somehow push batches back into queue?
+        this._client(config);
+      }
+    });
   }
 
   get queue() {
